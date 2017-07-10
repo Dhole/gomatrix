@@ -14,6 +14,11 @@ type Event struct {
 	ID        string                 `json:"event_id"`            // The unique ID of this event
 	RoomID    string                 `json:"room_id"`             // The room the event was sent to. May be nil (e.g. for presence)
 	Content   map[string]interface{} `json:"content"`             // The JSON content of the event.
+	Unsigned  *struct {
+		PrevContent   map[string]interface{} `json:"prev_content"`   // The previous content for this state. Only present on State Events.
+		Age           int                    `json:"age"`            // Time in milliseconds since the event was sent.
+		TransactionID string                 `json:"transaction_id"` // The transaction ID set when this message was sent. This key will only be present for message events sent by the device calling this API.
+	} `json:"unsigned,omitempty"` // Information about this event which was not sent by the originating homeserver
 }
 
 // Body returns the value of the "body" key in the event content if it is

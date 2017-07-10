@@ -162,3 +162,32 @@ type RespSync struct {
 		} `json:"invite"`
 	} `json:"rooms"`
 }
+
+// RespKeysUpload is the JSON response for https://matrix.org/speculator/spec/drafts%2Fe2e/client_server/unstable.html#post-matrix-client-unstable-keys-upload
+type RespKeysUpload struct {
+}
+
+// RespKeysQuery is the JSON response for https://matrix.org/speculator/spec/drafts%2Fe2e/client_server/unstable.html#post-matrix-client-unstable-keys-query
+type RespKeysQuery struct {
+	Failures   map[string]interface{} `json:"failures"`
+	DeviceKeys map[string]map[string]struct {
+		UserID     string                       `json:"user_id"`
+		DeviceID   string                       `json:"device_id"`
+		Algorithms []string                     `json:"algorithms"`
+		Keys       map[string]string            `json:"keys"`
+		Signatures map[string]map[string]string `json:"signatures"`
+		Unsigned   struct {
+			DeviceDisplayName string `json:"device_display_name"`
+		} `json:"unsigned"`
+	} `json:"device_keys"`
+}
+
+// RespKeysClaim is the JSON response for https://matrix.org/speculator/spec/drafts%2Fe2e/client_server/unstable.html#post-matrix-client-unstable-keys-claim
+type RespKeysClaim struct {
+	Failures    map[string]interface{}                       `json:"failures"`
+	OneTimeKeys map[string]map[string]map[string]interface{} `json:"one_time_keys"`
+}
+
+// RespKeysChanges is the JSON response for https://matrix.org/speculator/spec/drafts%2Fe2e/client_server/unstable.html#get-matrix-client-unstable-keys-changes
+type RespKeysChanges struct {
+}

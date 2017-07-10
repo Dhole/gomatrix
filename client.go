@@ -652,6 +652,57 @@ func (cli *Client) Messages(roomID, from, to string, dir rune, limit int) (resp 
 	return
 }
 
+// KeysUpload publishes end-to-end encryption keys for the device.
+// See https://matrix.org/speculator/spec/drafts%2Fe2e/client_server/unstable.html#post-matrix-client-unstable-keys-upload
+func (cli *Client) KeysUpload() {
+
+}
+
+// KeysQuery returns the current devices and identity keys for the given users.
+// Set the key in deviceKeys to an emtpy list to indicate all devices for the
+// corresponding user.  timeout is the time (in milliseconds) to wait when
+// downloading keys from remote servers; use a negative value to set timeout to
+// the recoended default (10 seconds).
+// See https://matrix.org/speculator/spec/drafts%2Fe2e/client_server/unstable.html#post-matrix-client-unstable-keys-query
+func (cli *Client) KeysQuery(deviceKeys map[string][]string,
+	timeout int) (resp *RespKeysQuery, err error) {
+	if timeout < 0 {
+		timeout = 10000
+	}
+	req := map[string]interface{}{
+		"timeout":     timeout,
+		"device_keys": deviceKeys,
+	}
+	urlPath := cli.BuildURL("keys", "query")
+	_, err = cli.MakeRequest("POST", urlPath, req, &resp)
+	return
+}
+
+// KeysClaim claims one-time keys for use in pre-key messages.  timeout is the
+// time (in milliseconds) to wait when downloading keys from remote servers;
+// use a negative value to set timeout to the recoended default (10 seconds).
+// See https://matrix.org/speculator/spec/drafts%2Fe2e/client_server/unstable.html#post-matrix-client-unstable-keys-claim
+func (cli *Client) KeysClaim(deviceKeysAlgorithms map[string]map[string]string,
+	timeout int) (resp *RespKeysClaim, err error) {
+	if timeout < 0 {
+		timeout = 10000
+	}
+	req := map[string]interface{}{
+		"timeout":       timeout,
+		"one_time_keys": deviceKeysAlgorithms,
+	}
+	urlPath := cli.BuildURL("keys", "claim")
+	_, err = cli.MakeRequest("POST", urlPath, req, &resp)
+	return
+}
+
+// KeysChanges gets a list of users who have updated their device identity keys
+// since a previous sync token.
+// See https://matrix.org/speculator/spec/drafts%2Fe2e/client_server/unstable.html#get-matrix-client-unstable-keys-changes
+func (cli *Client) KeysChanges() {
+
+}
+
 func txnID() string {
 	return "go" + strconv.FormatInt(time.Now().UnixNano(), 10)
 }
