@@ -79,7 +79,7 @@ func (cli *Client) BuildBaseURL(urlPath ...string) string {
 	return hsURL.String()
 }
 
-// BuildURLWithQuery builds a URL with query paramters in addition to the Client's homeserver/prefix/access_token set already.
+// BuildURLWithQuery builds a URL with query parameters in addition to the Client's homeserver/prefix/access_token set already.
 func (cli *Client) BuildURLWithQuery(urlPath []string, urlQuery map[string]string) string {
 	u, _ := url.Parse(cli.BuildURL(urlPath...))
 	q := u.Query()
@@ -384,6 +384,20 @@ func (cli *Client) JoinRoom(roomIDorAlias, serverName string, content interface{
 		urlPath = cli.BuildURL("join", roomIDorAlias)
 	}
 	_, err = cli.MakeRequest("POST", urlPath, content, &resp)
+	return
+}
+
+// GetDisplayName returns the display name of the user from the specified MXID. See https://matrix.org/docs/spec/client_server/r0.2.0.html#get-matrix-client-r0-profile-userid-displayname
+func (cli *Client) GetDisplayName(mxid string) (resp *RespUserDisplayName, err error) {
+	urlPath := cli.BuildURL("profile", mxid, "displayname")
+	_, err = cli.MakeRequest("GET", urlPath, nil, &resp)
+	return
+}
+
+// GetOwnDisplayName returns the user's display name. See https://matrix.org/docs/spec/client_server/r0.2.0.html#get-matrix-client-r0-profile-userid-displayname
+func (cli *Client) GetOwnDisplayName() (resp *RespUserDisplayName, err error) {
+	urlPath := cli.BuildURL("profile", cli.UserID, "displayname")
+	_, err = cli.MakeRequest("GET", urlPath, nil, &resp)
 	return
 }
 
@@ -701,6 +715,14 @@ func (cli *Client) KeysClaim(deviceKeysAlgorithms map[string]map[string]string,
 // See https://matrix.org/speculator/spec/drafts%2Fe2e/client_server/unstable.html#get-matrix-client-unstable-keys-changes
 func (cli *Client) KeysChanges() {
 
+}
+
+// TurnServer returns turn server details and credentials for the client to use when initiating calls.
+// See http://matrix.org/docs/spec/client_server/r0.2.0.html#get-matrix-client-r0-voip-turnserver
+func (cli *Client) TurnServer() (resp *RespTurnServer, err error) {
+	urlPath := cli.BuildURL("voip", "turnServer")
+	_, err = cli.MakeRequest("GET", urlPath, nil, &resp)
+	return
 }
 
 func txnID() string {

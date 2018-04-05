@@ -100,6 +100,11 @@ func (r RespUserInteractive) HasSingleStageFlow(stageName string) bool {
 	return false
 }
 
+// RespUserDisplayName is the JSON response for https://matrix.org/docs/spec/client_server/r0.2.0.html#get-matrix-client-r0-profile-userid-displayname
+type RespUserDisplayName struct {
+	DisplayName string `json:"displayname"`
+}
+
 // RespRegister is the JSON response for http://matrix.org/docs/spec/client_server/r0.2.0.html#post-matrix-client-r0-register
 type RespRegister struct {
 	AccessToken  string `json:"access_token"`
@@ -190,4 +195,11 @@ type RespKeysClaim struct {
 
 // RespKeysChanges is the JSON response for https://matrix.org/speculator/spec/drafts%2Fe2e/client_server/unstable.html#get-matrix-client-unstable-keys-changes
 type RespKeysChanges struct {
+}
+
+type RespTurnServer struct {
+	Username string   `json:"username"`
+	Password string   `json:"password"`
+	TTL      int      `json:"ttl"`
+	URIs     []string `json:"uris"`
 }
