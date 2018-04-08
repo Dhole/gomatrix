@@ -104,3 +104,8 @@ func GetHTMLMessage(msgtype, htmlText string) HTMLMessage {
 		FormattedBody: htmlText,
 	}
 }
+
+// SendToDeviceMessages is the JSON request for https://matrix.org/speculator/spec/drafts%2Fe2e/client_server/unstable.html#put-matrix-client-unstable-sendtodevice-eventtype-txnid
+type SendToDeviceMessages struct {
+	Messages map[string]map[string]interface{} `json:"messages"`
+}

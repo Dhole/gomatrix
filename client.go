@@ -666,17 +666,44 @@ func (cli *Client) Messages(roomID, from, to string, dir rune, limit int) (resp 
 	return
 }
 
+type RoomID string
+type UserID string
+type SessionID string
+type DeviceID string
+
+type DeviceKeys struct {
+	UserID     UserID                       `json:"user_id" structs:"user_id"`
+	DeviceID   DeviceID                     `json:"device_id" structs:"device_id"`
+	Algorithms []string                     `json:"algorithms" structs:"algorithms"`
+	Keys       map[string]string            `json:"keys" structs:"keys"`
+	Signatures map[string]map[string]string `json:"signatures" structs:"signatures"`
+}
+
+type OneTimeKey struct {
+	Key        string                       `json:"key" structs:"key"`
+	Signatures map[string]map[string]string `json:"signatures" structs:"signatures"`
+}
+
 // KeysUpload publishes end-to-end encryption keys for the device.
 // See https://matrix.org/speculator/spec/drafts%2Fe2e/client_server/unstable.html#post-matrix-client-unstable-keys-upload
-func (cli *Client) KeysUpload() {
-
+func (cli *Client) KeysUpload(deviceKeys *DeviceKeys,
+	oneTimeKeys map[string]OneTimeKey) (resp *RespKeysUpload, err error) {
+	req := map[string]interface{}{
+		"device_keys":   deviceKeys,
+		"one_time_keys": oneTimeKeys,
+	}
+	m, _ := json.Marshal(req)
+	fmt.Printf("\n\n%s\n\n", m)
+	urlPath := cli.BuildURL("keys", "upload")
+	_, err = cli.MakeRequest("POST", urlPath, req, &resp)
+	return
 }
 
 // KeysQuery returns the current devices and identity keys for the given users.
 // Set the key in deviceKeys to an emtpy list to indicate all devices for the
 // corresponding user.  timeout is the time (in milliseconds) to wait when
 // downloading keys from remote servers; use a negative value to set timeout to
-// the recoended default (10 seconds).
+// the recomended default (10 seconds).
 // See https://matrix.org/speculator/spec/drafts%2Fe2e/client_server/unstable.html#post-matrix-client-unstable-keys-query
 func (cli *Client) KeysQuery(deviceKeys map[string][]string,
 	timeout int) (resp *RespKeysQuery, err error) {
@@ -715,6 +742,24 @@ func (cli *Client) KeysClaim(deviceKeysAlgorithms map[string]map[string]string,
 // See https://matrix.org/speculator/spec/drafts%2Fe2e/client_server/unstable.html#get-matrix-client-unstable-keys-changes
 func (cli *Client) KeysChanges() {
 
+}
+
+// UpdateDevice updates the metadata on the given device.
+// See https://matrix.org/speculator/spec/drafts%2Fe2e/client_server/unstable.html#put-matrix-client-unstable-devices-deviceid
+func (cli *Client) UpdateDevice(deviceID, displayName string) (err error) {
+	req := map[string]string{"display_name": displayName}
+	urlPath := cli.BuildURL("devices", deviceID)
+	_, err = cli.MakeRequest("PUT", urlPath, req, nil)
+	return
+}
+
+// SendToDevice is used to send send-to-device events to a set of client devices.
+// See https://matrix.org/speculator/spec/drafts%2Fe2e/client_server/unstable.html#put-matrix-client-unstable-sendtodevice-eventtype-txnid
+func (cli *Client) SendToDevice(eventType string, msgs *SendToDeviceMessages) (err error) {
+	txnID := txnID()
+	urlPath := cli.BuildURL("sendToDevice", eventType, txnID)
+	_, err = cli.MakeRequest("PUT", urlPath, msgs, nil)
+	return
 }
 
 // TurnServer returns turn server details and credentials for the client to use when initiating calls.
