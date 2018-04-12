@@ -7,6 +7,7 @@ import (
 	"bytes"
 	"encoding/json"
 	"fmt"
+	olm "gitlab.com/dhole/go-olm"
 	"io"
 	"io/ioutil"
 	"net/http"
@@ -680,7 +681,7 @@ type DeviceKeys struct {
 }
 
 type OneTimeKey struct {
-	Key        string                       `json:"key" structs:"key"`
+	Key        olm.Curve25519               `json:"key" structs:"key"`
 	Signatures map[string]map[string]string `json:"signatures" structs:"signatures"`
 }
 
